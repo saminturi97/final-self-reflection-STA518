@@ -1,0 +1,325 @@
+---
+title: "Sta-518 Self Reflection"
+author: "Sam_Inturi"
+date: "11/16/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(haven)
+library(labelled)
+library(readr)
+library(readxl)
+library(stringr)
+library(dplyr)
+library(nlme)
+library(gapminder)
+```
+
+# STA 518 Objectives:-
+
+## 1.Import, manage, and clean data:-
+
+I can import data from a variety of sources.
+
+```{r}
+# Read TXT files with read.table()
+children <- read.table("https://alexd106.github.io/intro2R/data/children.txt", header = TRUE)
+children
+
+# Read in csv files with read_csv()
+college<- read_csv("data/recent-grads.csv")
+college
+
+# Read in xlsx files with read_excel()
+fxlsx <- read_excel("data/loyn.xlsx")
+fxlsx
+
+# Read in csv files with readr::read_csv() 
+banksal <- readr::read_csv("data/banksalary.csv")
+banksal
+
+# reading a large data set 
+nls <- read_dta(file="https://github.com/ozanj/rclass/raw/master/data/nls72/nls72stu_percontor_vars.dta")
+nls
+nc <- read_csv("data/nc.csv") 
+country <- gapminder
+people <- starwars
+```
+
+I can isolate information from a larger data source.
+
+```{r}
+# I am taking the above children table to perform data isolation operations
+# filter operation
+
+filter(children, sex == "M" & age == "15")
+
+# I am taking the above banksal table to perform data isolation operations
+fbanksal <- filter(banksal, bsal >= 6000 & senior >= 60)
+fbanksal
+
+# Randomly select rows from banksal table
+slice_sample(banksal, n = 5, replace = TRUE)
+
+# using select statement 
+select(iris, petal_length = Petal.Length)
+
+```
+
+I can combine information from multiple data sources
+
+Example data tables
+
+```{r}
+orders <- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/merging/data/orders.csv", as.is = TRUE)
+orders
+customers <- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/merging/data/customers.csv", as.is = TRUE)
+customers
+```
+
+Joining data tables
+
+```{r}
+# Inner_join creates a new table which is restricted to cases where the values of “by variable” exist in both data sets. All columns from both data sets are returned for these cases.
+inner_join(x = orders, y = customers, by = "id")
+
+# Left_join returns all cases from the x data table, regardless of whether there are matching values of the by variable(s) in y. All columns from both data tables are returned for these cases.
+left_join(x = orders, y = customers, by = "id")
+
+# Right_join returns all cases from the y data table, regardless of whether there are matching values of the by variable(s) in x. All columns from both data tables are returned for these cases.
+right_join(x = orders, y = customers, by = "id")
+
+# Full_join returns all rows and columns from both x and y.
+full_join(x = orders, y = customers, by = "id")
+
+# Semi_join returns all rows from the x data table where there are matching values of the by variable(s) in y, and only the columns from x.
+semi_join(x = orders, y = customers, by = "id")
+```
+
+I can restructure information to be in a “tidy” format.
+
+```{r}
+# restructure a dataset to be in a more efficient format and add features to make a table more understandable
+wide_measures <- country %>% 
+  filter(year == 2002) %>% 
+  group_by(continent) %>% 
+  summarise(
+    med_LE = median(pop),
+    mean_LE = mean(pop)
+  )
+
+wide_measures %>% 
+  pivot_longer(
+    cols = ends_with("_LE"),
+    names_to = "measure",
+    values_to = "values"
+  ) 
+
+long_measures <- wide_measures %>% 
+  pivot_longer(
+    cols = ends_with("_LE"),
+    names_to = "measure",
+    values_to = "values"
+  )
+
+long_measures %>% 
+  pivot_wider(
+    names_from = continent,
+    values_from = values
+  )
+```
+
+I can transform information to be in a format better suited for specific tasks.
+
+```{r}
+# parsing strings of information to create new variables and controlling the order in which  variables are displayed 
+people %>% 
+  drop_na(skin_color) %>% 
+  group_by(skin_color) %>% 
+  summarise(n = n()) %>% 
+  arrange(n) %>% 
+  print(n = length(skin_color))
+
+# reducing the dataset for better fit
+reducing_dataset <- people %>% 
+  select(skin_color) %>% 
+  separate(skin_color, 
+           into =  c("skin_first", "skin_second")) %>% 
+  pivot_longer(cols = everything(), 
+               names_to = "skin_order", 
+               values_to = "skin_color", 
+               values_drop_na = TRUE) %>% 
+  select(skin_color)
+reducing_dataset
+
+```
+
+## Create graphical displays and numerical summaries of data for exploratory analysis and presentations.
+
+I can create graphical displays of data that highlight key features. I can combine multiple graphical displays or numerical summaries into an effective data product.
+
+```{r}
+# histogram
+ggplot(data = nc, aes(x = weeks))+ 
+  geom_histogram()
+# collered and labeled histogram
+ggplot(data = nc, aes(x = weight))+ 
+  geom_histogram(binwidth = 1, color = "white", fill = "steelblue")+
+  labs(x = "weight of newborns (which is in lbs)", y = "number of cases", 
+       title = "Relationship between weight of newborns (which is in lbs) and number of cases")
+# two histo grams in one plane
+ggplot(data = nc, aes(x = weight)) +
+  geom_histogram(binwidth = 0.5, color = "white", fill = "steelblue") +
+  facet_wrap(~ gender, ncol = 1)
+# scatter plot
+ggplot(data = nc, aes(x = weeks, y = weight)) + 
+  geom_point()
+# box plot
+ggplot(data = nc, aes(x = habit, y = weeks)) +
+  geom_boxplot(fill = "sienna")+
+  labs(x = "smoking habit", y = "pregnancy duration in weeks", 
+       title = "pregnancy duration in weeks by smoking habit")
+# adding color and labels to the plot
+ggplot(data = nc, aes(x = mage, y = weight, color = gender))+ 
+  geom_point() + 
+  labs(x = "age shown in months of newborns(Mon)", y = "weight of newborns(lbs)",
+       title = "Relationship between age shown in months of newborns(Mon) and weight of newborns(lbs)")
+# bar plot of the variable eye_color
+people %>% 
+  mutate(eye_color = fct_lump(eye_color, prop = 0.03), 
+         eye_color = fct_infreq(eye_color),            
+         eye_color = fct_rev(eye_color)) %>%           
+  ggplot(mapping = aes(x = eye_color)) +
+  geom_bar()
+```
+
+Creating my own functions
+
+```{r}
+generate_n_samples <- function(n){
+  tibble(
+    normal_distribution = rnorm(n = n, mean = 50, sd = 10),
+    exponential_distribution = rexp(n = n, rate = 0.2),
+    binomial_distribution = rbinom(n = n, size = 100, prob = 0.25),
+    uniform_distribution = runif(n = n, min = 10, max = 20)
+  )
+}
+
+generate_n_samples(50)
+```
+
+
+```{r}
+pow <- function(x, y) {
+# function to print x raised to the power y
+result <- x^y
+print(paste(x,"raised to the power", y, "is", result))
+}
+
+pow(2,10)
+pow(5,2)
+```
+
+```{r}
+# this function will return whether a given number is positive, negative or zero
+check <- function(x) {
+if (x > 0) {
+result <- "Positive"
+}
+else if (x < 0) {
+result <- "Negative"
+}
+else {
+result <- "Zero"
+}
+return(result)
+}
+
+check(1)
+check(-10)
+check(0)
+```
+
+```{r}
+g <- factor(c("a","b","a","b","a","b","a","b","a","b","a","b"))
+v <- c(1,4,1,4,1,4,2,8,2,8,2,8)
+d <- data.frame(g,v)
+d$cs <- ave(v, g, FUN=cumsum)
+d
+```
+
+Iterations
+
+```{r}
+# using The repeat() Statement
+Newton <- function(n, j=2, x=1) {
+   # Use Newton’s method to find the positive, real jth root of n,
+   # where the default is to find the square root of n or j = 2.
+   # x is a seed value to start the search.
+ 
+   old.x <- x
+   repeat {
+      # Update x
+      new.x <- old.x - ((old.x^j - n)) / (j * old.x^(j - 1))
+      # Compute relative error as a 2-norm.
+      conv <- sum((new.x - old.x)^2 / old.x^2)
+      # Exit test with return() statement
+      if(conv < 1e-10) return(old.x)
+      # Save interation result
+      old.x <- new.x
+   }
+}
+Newton(500, 2, 4)
+
+# using The while() Statement
+bit.string <- function(n) {
+tmp.string <- numeric(50)
+i <- 0
+while(n > 0) {
+   tmp.string[50 - i] <- n %% 2   # modula
+   n <- n %/% 2                   # integer divide
+   i <- i + 1
+}
+
+first.one <- match(1, tmp.string)
+return(tmp.string[first.one:50])
+}
+
+# Test the function
+bit.string(1)
+bit.string(2)
+bit.string(3)
+bit.string(4)
+bit.string(5)
+
+# using The for() Statement
+#creating a matrix using for()
+x <- matrix(0, nrow = 3, ncol = 4)
+for(i in 1:3)  {
+   for(j in 1:4)  {
+      x[i,j] <- i+j
+   }
+}
+x
+# Use for() to create vector of cumulative sums
+silly.csum <- function(N) {
+   s <- vector("numeric", N)
+   for (i in 1:N){
+      if(i == 1) s[i] <- 1
+   else s[i] <- s[i-1] + i;
+   }
+return(s)
+}
+
+# Test the function
+silly.csum(10)
+# Speed test1
+system.time(silly.csum(1e7))
+# speed test2
+system.time(cumsum(as.numeric(1:1e7)))
+
+```
+

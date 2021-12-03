@@ -1,0 +1,146 @@
+---
+title: "Self Reflection-2"
+author: "Sam_Inturi"
+date: "12/2/2021"
+output: html_document
+---
+
+Write R programs for simulations from probability models and randomization-based experiments and Write clear, efficient, and well-documented R programs 
+
+```{r}
+setwd("~/mySTA518/STA518-self-reflection-/Objectives/data")
+# read and combining the data sets
+#reading trainA dataset
+train1<-read.table("dataTrainA.txt",header = TRUE)
+#reading trainB dataset
+train2<-read.table("dataTrainB.txt",header = TRUE)
+#reading testA dataset
+test1<-read.table("dataTestA.txt",header = TRUE)
+#reading testB dataset
+test2<-read.table("dataTestB.txt",header = TRUE)
+#Combining two train data sources with id key variable .i.e.,inner join
+combinedtrain<-merge(train1,train2,by=c("id","atRisk"))
+#Combining two test data sources with id key variable .i.e.,inner join
+combinedtest<-merge(test1,test2,by=c("id","atRisk"))
+summary(combinedtrain)
+summary(combinedtest)
+#cleaning the data sets
+#removing missing values in train data set
+newcombinedtrain<-na.omit(combinedtrain)
+#removing missing values in test data set
+newcombinedtest<-na.omit(combinedtest)
+
+library(dplyr)
+summary(newcombinedtrain)
+summary(newcombinedtest)
+#removing the outliers from train data set by using the given acceptable values
+newcombinedtrain_clean=filter(newcombinedtrain,
+                     temp>=90 & temp<=106,
+                     bpSys>=90 & bpSys<=150,
+                     vo2>=10 & vo2<=70,
+                     throat>=80 & throat<=120,
+                     atRisk==0 | atRisk==1,
+                     headA>=0 & headA<=9,
+                     bodyA>=0 & bodyA<=9,
+                     cough==0 | cough==1,
+                     runny==0 | runny==1,
+                     nausea==0 | nausea==1,
+                     diarrhea==0 | diarrhea==1)
+summary(newcombinedtrain_clean)
+#removing the outliers from test data set by using the given acceptable values
+newcombinedtest_clean=filter(newcombinedtest,
+                              temp>=90 & temp<=106,
+                              bpSys>=90 & bpSys<=150,
+                              vo2>=10 & vo2<=70,
+                              throat>=80 & throat<=120,
+                              atRisk==0 | atRisk==1,
+                              headA>=0 & headA<=9,
+                              bodyA>=0 & bodyA<=9,
+                              cough==0 | cough==1,
+                              runny==0 | runny==1,
+                              nausea==0 | nausea==1,
+                              diarrhea==0 | diarrhea==1)
+summary(newcombinedtest_clean)
+#Desiccation trees classification
+library(rpart)
+library(rpart.plot)
+set.seed(1)
+#creating a Desiccation tree model using training data set 
+treemodel=rpart(atRisk~., newcombinedtrain_clean,method = "class")
+#visualizing the model in a tree format
+rpart.plot(treemodel) 
+#using the tree we are doing some predictions
+treeprediction=predict(treemodel,newcombinedtest_clean,type = "class")
+#the prediction table
+table(treeprediction)
+#printing the predictions and actual values in a table(confusion matrix of depiction tree)
+tabtree=table(newcombinedtest_clean[,2],treeprediction)
+tabtree
+#naive bases classification
+library(naivebayes)
+library(dplyr)
+library(ggplot2)
+library(psych)
+library(e1071)
+#reading the data 
+dftrain<-newcombinedtrain_clean
+dftest<-newcombinedtest_clean
+#concerting the attribute types to factor
+for (i in c(1:12)) {dftrain[,i] <- as.factor(dftrain[,i])}
+for (i in c(1:12)) {dftest[,i] <- as.factor(dftest[,i])}
+set.seed(1)
+#building a model
+naivemodel=naiveBayes(atRisk~.,data = dftrain)
+#predicting the values
+naivepredict=predict(naivemodel,dftest)
+#the prediction table
+table(naivepredict)
+#printing the predictions and actual values in a table(confusion matrix of naive bayes)
+tabnav=table(dftest[,2],naivepredict)
+tabnav
+png(file="naiveplot.png")
+hist(newcombinedtest_clean[,c(2)],col = "darkblue")
+dev.off()
+#Support vector machine(SVM) kernel = linear 
+library(e1071)
+set.seed(1)
+for(i in c(1,3,4,5,6,7,8,9,10,11,12)){
+  newcombinedtrain_clean[,i] = as.numeric(newcombinedtrain_clean[,i])
+  newcombinedtest_clean[,i] = as.numeric(newcombinedtest_clean[,i])
+}
+svmmodel <- svm(newcombinedtrain_clean[,c(3,4,5,6,7,8,9,10,11,12)],
+            newcombinedtrain_clean[,2], kernel = "linear")
+svmpredict <- predict(svmmodel, newcombinedtest_clean[,c(3,4,5,6,7,8,9,10,11,12)])
+table(svmpredict)
+tabsvmlin=table(svmpredict, newcombinedtest_clean[,2])
+tabsvmlin
+#Support vector machine(SVM) kernel = polynomial
+svmmodelpoly <- svm(newcombinedtrain_clean[,c(3,4,5,6,7,8,9,10,11,12)],
+                newcombinedtrain_clean[,2], kernel = "polynomial")
+svmpredictpoly <- predict(svmmodelpoly, newcombinedtest_clean[,c(3,4,5,6,7,8,9,10,11,12)])
+table(svmpredictpoly)
+tabsvmpol=table(svmpredictpoly, newcombinedtest_clean[,2])
+tabsvmpol
+#ANN claficitation
+library(class)
+library(neuralnet)
+modneur = neuralnet(atRisk~.,newcombinedtrain_clean, hidden = 3)
+predneur = compute(modneur,newcombinedtest_clean)
+predneur$net.result
+tabann = table(predneur$net.result>.5, newcombinedtest_clean[,2])
+tabann
+#KNN
+knnpredict = knn(newcombinedtrain_clean,newcombinedtest_clean,cl=newcombinedtrain_clean[,2],k=3)
+tabknn = table(knnpredict,newcombinedtest_clean[,2])
+tabknn
+#finding accuracy for the classifications 
+accuricy = function(i){sum(diag(i)/(sum(rowSums(i)))) * 100}
+accuricy(tabtree)
+accuricy(tabnav)
+accuricy(tabsvmlin)
+accuricy(tabsvmpol)
+accuricy(tabann)
+accuricy(tabknn)
+
+```
+
