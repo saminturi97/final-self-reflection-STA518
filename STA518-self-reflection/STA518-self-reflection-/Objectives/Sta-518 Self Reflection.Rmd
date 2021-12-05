@@ -25,7 +25,7 @@ library(gapminder)
 
 ## 1.Import, manage, and clean data:-
 
-The below R code chunk is example of how I can import data from various data sources. I have learned to input different types of data sets    
+1. The below R code chunk is example of how I can import data from various data sources. I have learned to input different types of data sets using respected read functions for each file type and this would show my progress that I have made towards the objective "I can import data from a variety of sources".   
 
 ```{r}
 # Read TXT files with read.table()
@@ -48,28 +48,50 @@ banksal
 nls <- read_dta(file="https://github.com/ozanj/rclass/raw/master/data/nls72/nls72stu_percontor_vars.dta")
 nls
 nc <- read_csv("data/nc.csv") 
+nc
 country <- read_excel("data/country.xlsx")
+country
 people <- read_excel("data/people.xlsx")
+people
+PATH <- "https://raw.githubusercontent.com/guru99-edu/R-Programming/master/travel_times.csv"
+df <- read.csv(PATH)
+df
 ```
 
-I can isolate information from a larger data source.
+2. By looking at the this Sta-518 Self Reflection.Rmd file I would say that I can write a clear and organised report that can be explain the work I have done towards the course objectives using R Markdown. This would show how my work satisfy the objective "I can write professional reports using R Markdown".    
+
+3. In the below R code chunk you can see my work which would show my progress that I have made towards the objective "I can isolate information from a larger data source". In the below code I have used select(), Filter(), Pipeline(%>%), and arrange() 
 
 ```{r}
 # I am taking the above children table to perform data isolation operations
-# filter operation
-
+# filter function
 filter(children, sex == "M" & age == "15")
-
 # I am taking the above banksal table to perform data isolation operations
 fbanksal <- filter(banksal, bsal >= 6000 & senior >= 60)
 fbanksal
-
+# Select the variablesx, Date and DayOfWeek from df dataset.
+select(df, x, Date, DayOfWeek)
+# Select all variables from 1st row to 4th row from df dataset.
+select(df, 1:4)
+# Exclude -Comments and -FuelEconomy from the dataset from df dataset.
+select(df, -Comments, -FuelEconomy)
 # Randomly select rows from banksal table
 slice_sample(banksal, n = 5, replace = TRUE)
-
 # using select statement 
 select(iris, petal_length = Petal.Length)
-
+# Create the data frame filter_home_wed.It will be the object return at the end of the pipeline
+filter_home_wed <- df %>% 
+select(GoingTo, DayOfWeek) %>% 
+filter(GoingTo == "Home",DayOfWeek == "Wednesday")
+filter_home_wed
+identical((filter_home_wed%>%filter(GoingTo == "Home",DayOfWeek == "Wednesday")), filter_home_wed)
+# unsig arrange() function
+# Ascending sort of variable age
+children %>% arrange(age)
+# Ascending sort of variable age and weight
+children %>% arrange(age, weight)
+# Descending sort of variable age and ascending sort of weight
+children %>% arrange(desc(age), weight)
 ```
 
 I can combine information from multiple data sources
@@ -78,9 +100,7 @@ Example data tables
 
 ```{r}
 orders <- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/merging/data/orders.csv", as.is = TRUE)
-orders
 customers <- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/merging/data/customers.csv", as.is = TRUE)
-customers
 ```
 
 Joining data tables
