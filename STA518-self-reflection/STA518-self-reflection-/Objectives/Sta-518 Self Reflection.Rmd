@@ -2,11 +2,14 @@
 title: "Sta-518 Self Reflection"
 author: "Sam_Inturi"
 date: "11/16/2021"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(writexl)
 library(tidyverse)
 library(haven)
 library(labelled)
@@ -22,7 +25,7 @@ library(gapminder)
 
 ## 1.Import, manage, and clean data:-
 
-I can import data from a variety of sources.
+The below R code chunk is example of how I can import data from various data sources. I have learned to input different types of data sets    
 
 ```{r}
 # Read TXT files with read.table()
@@ -45,8 +48,8 @@ banksal
 nls <- read_dta(file="https://github.com/ozanj/rclass/raw/master/data/nls72/nls72stu_percontor_vars.dta")
 nls
 nc <- read_csv("data/nc.csv") 
-country <- gapminder
-people <- starwars
+country <- read_excel("data/country.xlsx")
+people <- read_excel("data/people.xlsx")
 ```
 
 I can isolate information from a larger data source.
@@ -135,14 +138,6 @@ long_measures %>%
 I can transform information to be in a format better suited for specific tasks.
 
 ```{r}
-# parsing strings of information to create new variables and controlling the order in which  variables are displayed 
-people %>% 
-  drop_na(skin_color) %>% 
-  group_by(skin_color) %>% 
-  summarise(n = n()) %>% 
-  arrange(n) %>% 
-  print(n = length(skin_color))
-
 # reducing the dataset for better fit
 reducing_dataset <- people %>% 
   select(skin_color) %>% 
@@ -320,6 +315,5 @@ silly.csum(10)
 system.time(silly.csum(1e7))
 # speed test2
 system.time(cumsum(as.numeric(1:1e7)))
-
 ```
 
