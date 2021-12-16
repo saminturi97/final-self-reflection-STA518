@@ -219,7 +219,7 @@ people %>%
 
 ### Write R programs for simulations from probability models and randomization-based experiments
 
-we can write our one function in order to make repetitive operations using a single command. first we have to start by defining our function “my_function” and the input parameter(s) that the user will feed to the function. Afterwards we will define the operation that we desire to program in the body of the function within curly braces ({}). Finally, we need to assign the result (or output) of our function in the return statement.
+we can write our one function in order to make repetitive operations using a single command. first we have to start by defining our function “my_function” and the input parameter(s) that the user will feed to the function. Afterwards we will define the operation that we desire to program in the body of the function within curly braces ({}). Finally, we need to assign the result (or output) of our function in the return statement. from this I would say that  
 
 ```{r}
 generate_n_samples <- function(n){
