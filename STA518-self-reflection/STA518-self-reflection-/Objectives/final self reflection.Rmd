@@ -219,7 +219,7 @@ people %>%
 
 ### Write R programs for simulations from probability models and randomization-based experiments
 
-we can write our one function in order to make repetitive operations using a single command. first we have to start by defining our function “my_function” and the input parameter(s) that the user will feed to the function. Afterwards we will define the operation that we desire to program in the body of the function within curly braces ({}). Finally, we need to assign the result (or output) of our function in the return statement. from this I would say that  
+we can write our one function in order to make repetitive operations using a single command. first we have to start by defining our function “my_function” and the input parameter(s) that the user will feed to the function. Afterwards we will define the operation that we desire to program in the body of the function within curly braces ({}). Finally, we need to assign the result (or output) of our function in the return statement. from this I would say that I can create my own functions and I can use them to combine data sources. 
 
 ```{r}
 generate_n_samples <- function(n){
@@ -274,13 +274,31 @@ d
 ```
 
 
+
 ### Use source documentation and other I can identify and correct common errors and in R programs.
+
+one of the new function that I explored is Data import with readr, readxl, and googlesheets4 from this package I have learned how to import not only a structured data but we can also input unstructured data as well along with that we can also import not only tabular data we can also import textual data and start analyse the document like frequency of words usage in the document, length the document and also know if any plagiarism has occurred. You can take example code I have writen in first objective for this task as well.        
 
 ### Write clear, efficient, and well-documented R programs
 
+```{r}
+tip <- read_csv("~/mySTA518/final-self-reflection-STA518/STA518-self-reflection/STA518-self-reflection-/Objectives/data/TipData.csv")
+tip2 <- tip%>%dplyr::select(-Party) %>% drop_na() 
+
+```
 
 
+# Question 4:-
 
+Based on the progress you have made (i.e., see your response in (3)), what final grade would you give yourself for this course? Try to stick to the major grade levels (“A”, “B”, “C”, or “D or below”). Please reach out to me if you have concerns or were unable to finish your final project   
+
+Ans: Based on the progress I made in this course I think my final grade should be A.
+
+# Question 5:-
+
+Do you have any other thoughts or reflections about the course that you'd like to share?
+
+Ans: I feel like giving a grade in the end of the course with our self-reflection and project work is kind of difficult for me as I am an international student this is a completely new process for me.
 
 
 
