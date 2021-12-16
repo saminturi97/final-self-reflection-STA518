@@ -150,9 +150,37 @@ reducing_dataset <- people %>%
 reducing_dataset
 ```
 
+Now I am doing the task to combine information from multiple data sources using five different types of join's they are inner, left, right, fill and semi joins functions.
+
+Example data tables
+
+```{r}
+orders <- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/merging/data/orders.csv", as.is = TRUE)
+customers <- read.csv("https://raw.githubusercontent.com/ds4stats/r-tutorials/master/merging/data/customers.csv", as.is = TRUE)
+```
+
+Joining data tables
+
+```{r}
+# Inner_join creates a new table which is restricted to cases where the values of “by variable” exist in both data sets. All columns from both data sets are returned for these cases.
+inner_join(x = orders, y = customers, by = "id")
+
+# Left_join returns all cases from the x data table, regardless of whether there are matching values of the by variable(s) in y. All columns from both data tables are returned for these cases.
+left_join(x = orders, y = customers, by = "id")
+
+# Right_join returns all cases from the y data table, regardless of whether there are matching values of the by variable(s) in x. All columns from both data tables are returned for these cases.
+right_join(x = orders, y = customers, by = "id")
+
+# Full_join returns all rows and columns from both x and y.
+full_join(x = orders, y = customers, by = "id")
+
+# Semi_join returns all rows from the x data table where there are matching values of the by variable(s) in y, and only the columns from x.
+semi_join(x = orders, y = customers, by = "id")
+```
+
 ### Create graphical displays and numerical summaries of data for exploratory analysis and presentations.
 
-In the below code I have created different graphs using ggplot2 package I have learned visualizations from the activities we have done in the class and in this below example I have created the the visualizations for different datasets and different graphs.   
+In the below code I have created different graphs using ggplot2 package I have learned visualizations from the activities we have done in the class and in this below example I have created the the visualizations for different datasets and different graphs. and from looking the below code I can say that I am  able to create graphical displays of data that highlight key features and combine multiple graphical displays or numerical summaries into an effective data product.  
 
 ```{r}
 # histogram
@@ -189,11 +217,66 @@ people %>%
   geom_bar()
 ```
 
+### Write R programs for simulations from probability models and randomization-based experiments
+
+we can write our one function in order to make repetitive operations using a single command. first we have to start by defining our function “my_function” and the input parameter(s) that the user will feed to the function. Afterwards we will define the operation that we desire to program in the body of the function within curly braces ({}). Finally, we need to assign the result (or output) of our function in the return statement.
+
+```{r}
+generate_n_samples <- function(n){
+  tibble(
+    normal_distribution = rnorm(n = n, mean = 50, sd = 10),
+    exponential_distribution = rexp(n = n, rate = 0.2),
+    binomial_distribution = rbinom(n = n, size = 100, prob = 0.25),
+    uniform_distribution = runif(n = n, min = 10, max = 20)
+  )
+}
+
+generate_n_samples(50)
+```
+
+```{r}
+pow <- function(x, y) {
+# function to print x raised to the power y
+result <- x^y
+print(paste(x,"raised to the power", y, "is", result))
+}
+
+pow(2,10)
+pow(5,2)
+```
+
+```{r}
+# this function will return whether a given number is positive, negative or zero
+check <- function(x) {
+if (x > 0) {
+result <- "Positive"
+}
+else if (x < 0) {
+result <- "Negative"
+}
+else {
+result <- "Zero"
+}
+return(result)
+}
+
+check(1)
+check(-10)
+check(0)
+```
+
+```{r}
+g <- factor(c("a","b","a","b","a","b","a","b","a","b","a","b"))
+v <- c(1,4,1,4,1,4,2,8,2,8,2,8)
+d <- data.frame(g,v)
+d$cs <- ave(v, g, FUN=cumsum)
+d
+```
 
 
+### Use source documentation and other I can identify and correct common errors and in R programs.
 
-
-
+### Write clear, efficient, and well-documented R programs
 
 
 
