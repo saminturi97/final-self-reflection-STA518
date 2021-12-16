@@ -1,0 +1,46 @@
+---
+title: "final self reflection"
+author: "Sam_Inturi"
+date: "12/9/2021"
+output: html_document
+---
+
+# Question 1:-
+
+1.	Provide a URL for your final project. If you created a Shiny App as your data product, you should include a link to the GitHub repository that contains your code as well as a link to your Shiny App hosted on shinyapp.io (see Chapter 2 of the shinyapps.io User Guide - this is free, but you need to sign up for an account). If you created some other type of data product, you should include a link to the GitHub repository that contains your code as well as a direct link to your data product.
+
+Ans: [This is Our STA 518 R Project link](https://saminturi.shinyapps.io/STA-test/) and  [This is Our STA 518 R Project Code in GitHub link](https://github.com/saminturi97/STA-518-Project.git)
+
+# Question 2:-
+
+2.	Did you work with a group? If so, include the names of your other group members here.
+
+Ans: Yes, I worked with a group. Shambhavi Inturi, Vinay Bommiraddy and Goutham Srinivas.
+
+# Question 3:-
+
+## STA 418/518 Objectives
+
+### Import, manage, and clean data
+
+In this section I want to show how I learned to Import, Manage and Clean the data by using tidyvarse package, readr package etc by using these packages we can perform the objectives Import, manage and clean the data. I mainly use select, filter, slice, arrange etc. 
+
+Firstly we install the required packages for performing the above operations and I am using a R markdown file to write this report so we have to write the code R code chunks Below I have shown how to install the packages in r code chunks. these are the packages that I am going to use for completing the cores objectives  
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(writexl)
+library(tidyverse)
+library(haven)
+library(labelled)
+library(readr)
+library(readxl)
+library(stringr)
+library(dplyr)
+library(nlme)
+library(gapminder)
+```
+
+
+
+
