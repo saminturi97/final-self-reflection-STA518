@@ -41,6 +41,164 @@ library(nlme)
 library(gapminder)
 ```
 
+Now below I have given an examples of how to read different types of files in to r-studio using read functions. There are different types of data files are available in the internet i.e., txt, csv, tsv and excel etc. I read these files using the readr function. we can reed a file directly from a the internet using the data link or you can save the file in rstudio files and just recall the file by giving its path name.   
+
+examples:-
+
+```{r}
+# Read TXT files with read.table()
+children <- read.table("https://alexd106.github.io/intro2R/data/children.txt", header = TRUE)
+
+# Read in csv files with read_csv()
+college<- read_csv("data/recent-grads.csv")
+
+# Read in xlsx files with read_excel()
+fxlsx <- read_excel("data/loyn.xlsx")
+
+# Read in csv files with readr::read_csv() 
+banksal <- readr::read_csv("data/banksalary.csv")
+
+# reading a large data set 
+nls <- read_dta(file="https://github.com/ozanj/rclass/raw/master/data/nls72/nls72stu_percontor_vars.dta")
+nc <- read_csv("data/nc.csv") 
+country <- read_excel("data/country.xlsx")
+people <- read_excel("data/people.xlsx")
+PATH <- "https://raw.githubusercontent.com/guru99-edu/R-Programming/master/travel_times.csv"
+df <- read.csv(PATH)
+```
+
+now I am perform the data management and cleaning operations by using filter, select, slice and pipe functions. The filter() function subsets a data frame, keeping only the rows that meet your standards. The select function is used to isolate or select a particular set of data or I can say that ir is useful for isolating the required data from a large data set. coming to pipe function using a pipe line function we can create a new dataset using lot of operations i.e., importing, merging, selecting, filtering and so on the pipeline operator is a part of dplyr library and it is used as "%>%". final i have also used the arrange() function which is used to arrange the numerical values from low to high or high to low. 
+
+```{r}
+# I am taking the above children table to perform data isolation operations
+# filter function
+filter(children, sex == "M" & age == "15")
+# I am taking the above banksal table to perform data isolation operations
+fbanksal <- filter(banksal, bsal >= 6000 & senior >= 60)
+fbanksal
+# Select the variablesx, Date and DayOfWeek from df dataset.
+select(df, x, Date, DayOfWeek)
+# Select all variables from 1st row to 4th row from df dataset.
+select(df, 1:4)
+# Exclude -Comments and -FuelEconomy from the dataset from df dataset.
+select(df, -Comments, -FuelEconomy)
+# Randomly select rows from banksal table
+slice_sample(banksal, n = 5, replace = TRUE)
+# using select statement 
+select(iris, petal_length = Petal.Length)
+# Create the data frame filter_home_wed.It will be the object return at the end of the pipeline
+filter_home_wed <- df %>% 
+select(GoingTo, DayOfWeek) %>% 
+filter(GoingTo == "Home",DayOfWeek == "Wednesday")
+filter_home_wed
+identical((filter_home_wed%>%filter(GoingTo == "Home",DayOfWeek == "Wednesday")), filter_home_wed)
+# unsig arrange() function
+# Ascending sort of variable age
+children %>% arrange(age)
+# Ascending sort of variable age and weight
+children %>% arrange(age, weight)
+# Descending sort of variable age and ascending sort of weight
+children %>% arrange(desc(age), weight)
+```
+
+I will now explore the "tidyr" package of the tideyvarse to perform Pivot_longer(), Pivot_wider() functions. these functions are used for tidying a dataset as you can see in the below example. 
+
+```{r}
+# restructure a dataset to be in a more efficient format and add features to make a table more understandable
+wide_measures <- country %>% 
+  filter(year == 2002) %>% 
+  group_by(continent) %>% 
+  summarise(
+    med_LE = median(pop),
+    mean_LE = mean(pop)
+  )
+
+wide_measures %>% 
+  pivot_longer(
+    cols = ends_with("_LE"),
+    names_to = "measure",
+    values_to = "values"
+  ) 
+
+long_measures <- wide_measures %>% 
+  pivot_longer(
+    cols = ends_with("_LE"),
+    names_to = "measure",
+    values_to = "values"
+  )
+
+long_measures %>% 
+  pivot_wider(
+    names_from = continent,
+    values_from = values
+  )
+```
+
+In the below code chunk I have constricted a tidy data which can be used to constrect visualizations and understand the data much better. 
+
+```{r}
+# reducing the dataset for better fit
+reducing_dataset <- people %>% 
+  select(skin_color) %>% 
+  separate(skin_color, 
+           into =  c("skin_first", "skin_second")) %>% 
+  pivot_longer(cols = everything(), 
+               names_to = "skin_order", 
+               values_to = "skin_color", 
+               values_drop_na = TRUE) %>% 
+  select(skin_color)
+reducing_dataset
+```
+
+### Create graphical displays and numerical summaries of data for exploratory analysis and presentations.
+
+In the below code I have created different graphs using ggplot2 package I have learned visualizations from the activities we have done in the class and in this below example I have created the the visualizations for different datasets and different graphs.   
+
+```{r}
+# histogram
+ggplot(data = nc, aes(x = weeks))+ 
+  geom_histogram()
+# collered and labeled histogram
+ggplot(data = nc, aes(x = weight))+ 
+  geom_histogram(binwidth = 1, color = "white", fill = "steelblue")+
+  labs(x = "weight of newborns (which is in lbs)", y = "number of cases", 
+       title = "Relationship between weight of newborns (which is in lbs) and number of cases")
+# two histo grams in one plane
+ggplot(data = nc, aes(x = weight)) +
+  geom_histogram(binwidth = 0.5, color = "white", fill = "steelblue") +
+  facet_wrap(~ gender, ncol = 1)
+# scatter plot
+ggplot(data = nc, aes(x = weeks, y = weight)) + 
+  geom_point()
+# box plot
+ggplot(data = nc, aes(x = habit, y = weeks)) +
+  geom_boxplot(fill = "sienna")+
+  labs(x = "smoking habit", y = "pregnancy duration in weeks", 
+       title = "pregnancy duration in weeks by smoking habit")
+# adding color and labels to the plot
+ggplot(data = nc, aes(x = mage, y = weight, color = gender))+ 
+  geom_point() + 
+  labs(x = "age shown in months of newborns(Mon)", y = "weight of newborns(lbs)",
+       title = "Relationship between age shown in months of newborns(Mon) and weight of newborns(lbs)")
+# bar plot of the variable eye_color
+people %>% 
+  mutate(eye_color = fct_lump(eye_color, prop = 0.03), 
+         eye_color = fct_infreq(eye_color),            
+         eye_color = fct_rev(eye_color)) %>%           
+  ggplot(mapping = aes(x = eye_color)) +
+  geom_bar()
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 

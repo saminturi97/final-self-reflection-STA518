@@ -169,7 +169,6 @@ reducing_dataset <- people %>%
                values_drop_na = TRUE) %>% 
   select(skin_color)
 reducing_dataset
-
 ```
 
 ## Create graphical displays and numerical summaries of data for exploratory analysis and presentations.
